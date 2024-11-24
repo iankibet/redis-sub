@@ -20,7 +20,7 @@ composer require iankibet/redis-sub
 After installation, publish the package configuration file:
 
 ```bash
-php artisan vendor:publish --tag=config
+php artisan vendor:publish --tag=redis-sub
 ```
 
 This will create a `config/redis-sub.php` file where you can define the Redis channels and their handlers.
