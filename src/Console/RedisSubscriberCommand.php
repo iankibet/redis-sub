@@ -65,7 +65,9 @@ class RedisSubscriberCommand extends Command
             $this->info("📡 Listening on channel: {$channel}");
             $this->displayHandlers($handlers);
         }
-        Redis::subscribe(array_keys($channels), function ($message, $channel) use ($channels) {
+        $connection = config('redis-sub.connection', 'default');
+        $redis = Redis::connection($connection);
+        $redis->subscribe(array_keys($channels), function ($message, $channel) use ($channels) {
             $redisDbPrefix = config('database.redis.options.prefix', '');
             $channel = str_replace($redisDbPrefix, '', $channel);
             $this->processMessage($message, $channel, $channels[$channel] ?? []);
@@ -75,7 +77,7 @@ class RedisSubscriberCommand extends Command
     protected function processMessage(string $message, string $channel, array $handlers): void
     {
         $timestamp = now()->format('Y-m-d H:i:s');
-        $this->info("⚡ [{$timestamp}] Received message on channel: {$channel}");
+        $this->warn("⚡ [{$timestamp}] Received message on channel: {$channel}");
         if (empty($handlers)) {
             $this->warn("⚠️ No handlers defined for channel: {$channel}");
             return;

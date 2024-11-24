@@ -17,4 +17,5 @@ return [
 //        ],
 //        'notifications' => \App\Events\MemberMessageReceived::class, // Single handler
     ],
+    'connection' => 'pubsub',
 ];
