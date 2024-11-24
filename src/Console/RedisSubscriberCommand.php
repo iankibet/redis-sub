@@ -135,19 +135,19 @@ class RedisSubscriberCommand extends Command
         throw new \RuntimeException("Cannot determine handler type for [{$handler}]");
     }
 
-    protected function dispatchJob(string $handler, array $payload, string $channel, string $timestamp): void
+    protected function dispatchJob(string $handler, $payload, string $channel, string $timestamp): void
     {
         dispatch(new $handler($payload));
         $this->info("✅ [{$timestamp}] Dispatched job: {$handler}");
     }
 
-    protected function dispatchEvent(string $handler, array $payload, string $channel, string $timestamp): void
+    protected function dispatchEvent(string $handler, $payload, string $channel, string $timestamp): void
     {
         event(new $handler($payload));
         $this->info("✅ [{$timestamp}] Dispatched event: {$handler}");
     }
 
-    protected function invokeHandler(string $handler, array $payload, string $channel, string $timestamp): void
+    protected function invokeHandler(string $handler, $payload, string $channel, string $timestamp): void
     {
         $instance = new $handler();
 
