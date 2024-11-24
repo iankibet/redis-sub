@@ -107,11 +107,11 @@ class RedisSubscriberCommand extends Command
         }
 
         $handlerType = $this->determineHandlerType($handler);
-
+        $payload = json_decode($message);
         match ($handlerType) {
-            'job' => $this->dispatchJob($handler, $message, $channel, $timestamp),
-            'event' => $this->dispatchEvent($handler, $message, $channel, $timestamp),
-            'callable' => $this->invokeHandler($handler, $message, $channel, $timestamp),
+            'job' => $this->dispatchJob($handler, $payload, $channel, $timestamp),
+            'event' => $this->dispatchEvent($handler, $payload, $channel, $timestamp),
+            'callable' => $this->invokeHandler($handler, $payload, $channel, $timestamp),
             default => throw new \RuntimeException("Invalid handler type for [{$handler}]")
         };
     }
@@ -135,30 +135,30 @@ class RedisSubscriberCommand extends Command
         throw new \RuntimeException("Cannot determine handler type for [{$handler}]");
     }
 
-    protected function dispatchJob(string $handler, string $message, string $channel, string $timestamp): void
+    protected function dispatchJob(string $handler, array $payload, string $channel, string $timestamp): void
     {
-        dispatch(new $handler($message));
+        dispatch(new $handler($payload));
         $this->info("✅ [{$timestamp}] Dispatched job: {$handler}");
     }
 
-    protected function dispatchEvent(string $handler, string $message, string $channel, string $timestamp): void
+    protected function dispatchEvent(string $handler, array $payload, string $channel, string $timestamp): void
     {
-        event(new $handler($message));
+        event(new $handler($payload));
         $this->info("✅ [{$timestamp}] Dispatched event: {$handler}");
     }
 
-    protected function invokeHandler(string $handler, string $message, string $channel, string $timestamp): void
+    protected function invokeHandler(string $handler, array $payload, string $channel, string $timestamp): void
     {
         $instance = new $handler();
 
         if (is_callable($instance)) {
-            $instance($message);
+            $instance($payload);
             $this->info("✅ [{$timestamp}] Invoked handler: {$handler}");
             return;
         }
 
         if (method_exists($instance, 'handle')) {
-            $instance->handle($message);
+            $instance->handle($payload);
             $this->info("✅ [{$timestamp}] Called handle method: {$handler}");
             return;
         }

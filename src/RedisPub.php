@@ -11,5 +11,6 @@ class RedisPub
         $message = json_encode($payload);
         $redis = Redis::connection(config('redis-sub.connection'));
         $redis->publish($channel, $message);
+
     }
 }
