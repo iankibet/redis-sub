@@ -126,16 +126,14 @@ class RedisSubscriberCommand extends Command
             return 'job';
         }
         foreach (self::HANDLER_TYPES as $type => $class) {
+            if (is_subclass_of($handler, $class)) {
+                return $type;
+            }
             if ($class === 'callable') {
                 $instance = new $handler();
                 if (is_callable($instance) || method_exists($instance, 'handle')) {
                     return $type;
                 }
-                continue;
-            }
-
-            if (is_subclass_of($handler, $class)) {
-                return $type;
             }
         }
 
