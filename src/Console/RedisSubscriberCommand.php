@@ -118,11 +118,11 @@ class RedisSubscriberCommand extends Command
 
     protected function determineHandlerType(string $handler): string
     {
-        if (str_contains($handler, 'App\Events')) {
+        if (str_contains(strtolower($handler), 'app\events')) {
             return 'event';
         }
         // check if job
-        if (str_contains($handler, 'App\Jobs')) {
+        if (str_contains(strtolower($handler), 'app\jobs')) {
             return 'job';
         }
         foreach (self::HANDLER_TYPES as $type => $class) {
